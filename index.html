@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Karl Lynex Technologies</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg:        #1a1200;
+    --bg2:       #2a1e00;
+    --bg3:       #3d2e00;
+    --surface:   #332600;
+    --border:    rgba(255,214,0,0.25);
+    --border2:   rgba(255,255,255,0.1);
+    --primary:   #ffd600;
+    --primary2:  #f57f17;
+    --white:     #ffffff;
+    --text:      #fff8e1;
+    --text2:     #ffe082;
+    --text3:     #a07820;
+    --shadow:    rgba(255,214,0,0.2);
+    --glow:      rgba(255,214,0,0.15);
+    --card-bg:   rgba(42,30,0,0.75);
+    --nav-bg:    rgba(26,18,0,0.92);
+    --hero-dot:  rgba(255,255,255,0.06);
+  }
+  [data-theme="light"] {
+    --bg:        #fffde7;
+    --bg2:       #fff9c4;
+    --bg3:       #fff176;
+    --surface:   #ffffff;
+    --border:    rgba(255,214,0,0.2);
+    --border2:   rgba(255,214,0,0.1);
+    --primary:   #f57f17;
+    --primary2:  #e65100;
+    --white:     #1a1200;
+    --text:      #1a1200;
+    --text2:     #f57f17;
+    --text3:     #a07820;
+    --shadow:    rgba(255,214,0,0.15);
+    --glow:      rgba(255,214,0,0.08);
+    --card-bg:   rgba(255,253,231,0.95);
+    --nav-bg:    rgba(255,253,231,0.96);
+    --hero-dot:  rgba(255,214,0,0.08);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    transition: background 0.4s, color 0.4s;
+  }
+
+  /* ===== ANIMATED BG ===== */
+  .bg-canvas {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    overflow: hidden;
+  }
+  .bg-canvas::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 20% 40%, var(--glow), transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 70%, rgba(255,214,0,0.08), transparent 60%);
+    animation: bgPulse 8s ease-in-out infinite alternate;
+  }
+  @keyframes bgPulse {
+    0%   { opacity: 0.6; }
+    100% { opacity: 1; }
+  }
+
+  /* Dot grid */
+  .dot-grid {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, var(--hero-dot) 1.5px, transparent 1.5px);
+    background-size: 40px 40px;
+  }
+
+  /* ===== NAVBAR ===== */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: var(--nav-bg);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 5%;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 70px;
+    transition: background 0.4s, border-color 0.4s;
+  }
+
+  .nav-logo {
+    display: flex; align-items: center; gap: 12px;
+    text-decoration: none;
+  }
+
+  /* SVG Logo inline in nav */
+  .nav-logo-mark {
+    width: 38px; height: 38px;
+  }
+
+  .nav-brand {
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--white);
+    transition: color 0.4s;
+  }
+  .nav-brand span { color: var(--primary); }
+
+  .nav-links {
+    display: flex; align-items: center; gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text2);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+
+  /* Theme toggle */
+  .theme-toggle {
+    display: flex; align-items: center; gap: 8px;
+    cursor: pointer;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 6px 14px;
+    transition: all 0.3s;
+  }
+  .theme-toggle:hover { border-color: var(--primary); }
+  .toggle-track {
+    width: 36px; height: 20px;
+    background: var(--primary2);
+    border-radius: 50px;
+    position: relative;
+    transition: background 0.3s;
+  }
+  .toggle-thumb {
+    position: absolute; top: 3px; left: 3px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 0.3s;
+  }
+  [data-theme="light"] .toggle-thumb { transform: translateX(16px); }
+  .toggle-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--text2);
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 100px 5% 60px;
+  }
+
+  /* Big logo SVG in hero */
+  .hero-logo-svg {
+    width: min(520px, 90vw);
+    margin-bottom: 48px;
+    animation: fadeUp 0.9s ease both;
+    filter: drop-shadow(0 0 30px var(--shadow));
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(30px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  .hero-tagline {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+    font-weight: 500;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 20px;
+    animation: fadeUp 0.9s 0.2s ease both;
+  }
+
+  .hero-headline {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(2.2rem, 6vw, 5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: 4px;
+    color: var(--white);
+    animation: fadeUp 0.9s 0.3s ease both;
+    transition: color 0.4s;
+  }
+  .hero-headline .hl { color: var(--primary); }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    font-weight: 400;
+    color: var(--text2);
+    margin-top: 20px;
+    max-width: 560px;
+    line-height: 1.7;
+    animation: fadeUp 0.9s 0.45s ease both;
+    transition: color 0.4s;
+  }
+
+  .hero-cta {
+    margin-top: 44px;
+    display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+    animation: fadeUp 0.9s 0.6s ease both;
+  }
+  .btn-primary {
+    padding: 14px 36px;
+    background: var(--primary2);
+    color: #fff;
+    border: none; border-radius: 4px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem; font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; cursor: pointer; text-decoration: none;
+    transition: all 0.25s;
+    box-shadow: 0 0 20px var(--shadow);
+  }
+  .btn-primary:hover {
+    background: var(--primary);
+    box-shadow: 0 0 32px var(--shadow);
+    transform: translateY(-2px);
+  }
+  .btn-outline {
+    padding: 14px 36px;
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 4px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem; font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; cursor: pointer; text-decoration: none;
+    transition: all 0.25s;
+  }
+  .btn-outline:hover {
+    background: rgba(255,214,0,0.1);
+    transform: translateY(-2px);
+  }
+
+  /* Scroll indicator */
+  .scroll-hint {
+    position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    animation: fadeUp 1s 1s ease both;
+  }
+  .scroll-hint span {
+    font-size: 0.7rem; letter-spacing: 4px; color: var(--text3); text-transform: uppercase;
+  }
+  .scroll-arrow {
+    width: 1px; height: 48px;
+    background: linear-gradient(to bottom, var(--primary), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+  /* ===== SECTIONS COMMON ===== */
+  section {
+    position: relative; z-index: 1;
+    padding: 100px 8%;
+  }
+  .section-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+    transition: color 0.4s;
+  }
+  .section-line {
+    width: 60px; height: 3px;
+    background: linear-gradient(to right, var(--primary), transparent);
+    margin-bottom: 48px;
+  }
+
+  /* ===== ABOUT ===== */
+  #about { background: var(--bg2); transition: background 0.4s; }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px; align-items: start;
+  }
+
+  .about-text p {
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--text2);
+    margin-bottom: 20px;
+    transition: color 0.4s;
+  }
+
+  .about-cards {
+    display: flex; flex-direction: column; gap: 20px;
+  }
+
+  .about-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 28px 30px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.35s;
+    backdrop-filter: blur(10px);
+  }
+  .about-card::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--primary), var(--primary2));
+    border-radius: 2px 0 0 2px;
+  }
+  .about-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 36px var(--shadow);
+  }
+
+  .card-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: rgba(255,214,0,0.1);
+    border: 1px solid rgba(255,214,0,0.25);
+    padding: 3px 10px;
+    border-radius: 3px;
+    margin-bottom: 12px;
+  }
+  [data-theme="light"] .card-badge {
+    background: rgba(255,214,0,0.08);
+    border-color: rgba(255,214,0,0.2);
+  }
+
+  .card-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 2px;
+    transition: color 0.4s;
+  }
+
+  .card-role {
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-top: 4px;
+    transition: color 0.4s;
+  }
+
+  .card-desc {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text2);
+    margin-top: 14px;
+    transition: color 0.4s;
+  }
+
+  /* Avatar circle for CEO */
+  .ceo-avatar {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary2), var(--primary));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+    box-shadow: 0 0 20px var(--shadow);
+  }
+
+  /* Team chip */
+  .team-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--text2);
+    margin: 6px 6px 0 0;
+    transition: all 0.3s;
+  }
+  .team-chip:hover { border-color: var(--primary); color: var(--primary); }
+  .chip-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--primary);
+    animation: chipPulse 2s ease-in-out infinite;
+  }
+  @keyframes chipPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.7)} }
+
+  /* ===== SERVICES ===== */
+  #services { background: var(--bg); transition: background 0.4s; }
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    margin-top: 48px;
+  }
+  .service-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 36px 28px;
+    transition: all 0.35s;
+    backdrop-filter: blur(10px);
+    position: relative; overflow: hidden;
+  }
+  .service-card::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, var(--glow), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .service-card:hover::after { opacity: 1; }
+  .service-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px var(--shadow);
+  }
+  .service-icon {
+    width: 52px; height: 52px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary2), var(--bg3));
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 22px;
+    font-size: 1.4rem;
+  }
+  .service-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    transition: color 0.4s;
+  }
+  .service-desc {
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: var(--text3);
+    transition: color 0.4s;
+  }
+
+  /* ===== STATS ===== */
+  #stats {
+    background: linear-gradient(135deg, var(--bg3), var(--bg2));
+    padding: 80px 8%;
+    transition: background 0.4s;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 40px; text-align: center;
+  }
+  .stat-num {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 900;
+    color: var(--white);
+    letter-spacing: 2px;
+    transition: color 0.4s;
+  }
+  .stat-num .unit { color: var(--primary); }
+  .stat-label {
+    font-size: 0.8rem; font-weight: 600;
+    letter-spacing: 4px; text-transform: uppercase;
+    color: var(--text3); margin-top: 8px;
+    transition: color 0.4s;
+  }
+
+  /* ===== CONTACT ===== */
+  #contact { background: var(--bg); transition: background 0.4s; }
+  .contact-inner {
+    max-width: 560px; margin: 0 auto; text-align: center;
+  }
+  .contact-inner .section-title { margin-bottom: 16px; }
+  .contact-inner p {
+    font-size: 1rem; line-height: 1.8;
+    color: var(--text2); margin-bottom: 36px;
+    transition: color 0.4s;
+  }
+  .contact-box {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px;
+    backdrop-filter: blur(10px);
+  }
+  .contact-field {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    outline: none;
+    transition: all 0.3s;
+  }
+  [data-theme="light"] .contact-field { background: rgba(255,214,0,0.04); }
+  .contact-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--glow); }
+  .contact-field::placeholder { color: var(--text3); }
+  textarea.contact-field { resize: vertical; min-height: 110px; }
+
+  /* ===== FOOTER ===== */
+  footer {
+    position: relative; z-index: 1;
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 40px 8%;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 20px;
+    transition: background 0.4s, border-color 0.4s;
+  }
+  .footer-brand {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem; font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--white); transition: color 0.4s;
+  }
+  .footer-brand span { color: var(--primary); }
+  .footer-copy {
+    font-size: 0.8rem; letter-spacing: 2px;
+    color: var(--text3); transition: color 0.4s;
+  }
+  .status-row {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.75rem; letter-spacing: 2px;
+    color: var(--text3);
+  }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #ffd600;
+    animation: statusPulse 2s ease-in-out infinite;
+  }
+  @keyframes statusPulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* Floating particles */
+  .particle {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    animation: float linear infinite;
+    opacity: 0;
+  }
+  @keyframes float {
+    0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+    10%  { opacity: 0.4; }
+    90%  { opacity: 0.2; }
+    100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+  }
+
+  /* ===== LOGO LOCK — never changes with theme ===== */
+  .hero-logo-svg,
+  .nav-logo-mark,
+  .about-logo-mini {
+    /* Force GPU layer so CSS vars in parent don't bleed in */
+    isolation: isolate;
+    color-scheme: dark; /* keep SVG in dark rendering context always */
+  }
+  /* Prevent any inherited filter or color shift on logo SVGs */
+  [data-theme="light"] .hero-logo-svg,
+  [data-theme="light"] .nav-logo-mark,
+  [data-theme="light"] .about-logo-mini {
+    filter: none !important;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media(max-width:768px){
+    .about-grid { grid-template-columns: 1fr; gap: 40px; }
+    .nav-links { display: none; }
+    nav { padding: 0 4%; }
+    section { padding: 80px 5%; }
+    footer { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="bg-canvas">
+  <div class="dot-grid"></div>
+</div>
+
+<!-- Floating particles -->
+<div id="particles"></div>
+
+<!-- ===== NAVBAR ===== -->
+<nav>
+  <a class="nav-logo" href="#">
+    <!-- Nav logo — ALL HARDCODED, never changes with theme -->
+    <svg class="nav-logo-mark" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="nl1" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="100%" stop-color="#ffd600"/>
+        </linearGradient>
+        <filter id="ng1"><feGaussianBlur stdDeviation="1.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <!-- HARDCODED dark fill — never changes -->
+      <circle cx="40" cy="40" r="39" fill="#1a1200" stroke="#ffd600" stroke-width="1.5" opacity="0.9"/>
+      <polygon points="40,8 69,24 69,56 40,72 11,56 11,24" fill="none" stroke="#ffd600" stroke-width="1.5" opacity="0.5"/>
+      <polygon points="40,18 58,28 58,52 40,62 22,52 22,28" fill="#2a1e00" stroke="url(#nl1)" stroke-width="2"/>
+      <line x1="27" y1="27" x2="27" y2="53" stroke="url(#nl1)" stroke-width="4" stroke-linecap="round"/>
+      <line x1="27" y1="39" x2="47" y2="27" stroke="url(#nl1)" stroke-width="4" stroke-linecap="round"/>
+      <line x1="27" y1="39" x2="47" y2="53" stroke="url(#nl1)" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="27" cy="39" r="3.5" fill="#1a1200" stroke="#ffd600" stroke-width="1.5"/>
+      <circle cx="27" cy="39" r="1.5" fill="#ffffff"/>
+    </svg>
+    <span class="nav-brand">KARL <span>LYNEX</span></span>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#stats">Stats</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+
+  <div class="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode">
+    <div class="toggle-track"><div class="toggle-thumb"></div></div>
+    <span class="toggle-label" id="themeLabel">DARK</span>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="home">
+  <!-- Big hero logo SVG — ALL COLORS HARDCODED, never changes with theme -->
+  <svg class="hero-logo-svg" viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- HARDCODED dark background — does NOT use CSS vars -->
+      <radialGradient id="hbg" cx="40%" cy="50%" r="70%">
+        <stop offset="0%" stop-color="#3d2e00"/>
+        <stop offset="100%" stop-color="#1a1200"/>
+      </radialGradient>
+      <linearGradient id="hblue" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#ffd600"/>
+        <stop offset="100%" stop-color="#f57f17"/>
+      </linearGradient>
+      <linearGradient id="hkarl" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#ffffff"/>
+        <stop offset="65%" stop-color="#fff8c0"/>
+        <stop offset="100%" stop-color="#ffd600"/>
+      </linearGradient>
+      <filter id="hglow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      <filter id="hglow2"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+
+    <!-- Background plate — HARDCODED dark, never changes -->
+    <rect width="700" height="280" rx="18" fill="url(#hbg)"/>
+    <rect x="1.5" y="1.5" width="697" height="277" rx="17" fill="none" stroke="#ffd600" stroke-width="1" opacity="0.35"/>
+    <!-- Corners -->
+    <polyline points="18,1.5 1.5,1.5 1.5,18" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.5"/>
+    <polyline points="682,1.5 698.5,1.5 698.5,18" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.5"/>
+    <polyline points="18,278.5 1.5,278.5 1.5,262" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.5"/>
+    <polyline points="682,278.5 698.5,278.5 698.5,262" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.5"/>
+
+    <!-- ICON (left side) -->
+    <g transform="translate(110,140)">
+      <!-- Orbit -->
+      <circle cx="0" cy="0" r="80" fill="none" stroke="#ffd600" stroke-width="0.8" stroke-dasharray="4 6" opacity="0.3"/>
+      <circle cx="0" cy="-80" r="4" fill="#ffffff" opacity="0.5" filter="url(#hglow)"/>
+      <circle cx="80" cy="0" r="4" fill="#ffd600" opacity="0.5" filter="url(#hglow)"/>
+      <circle cx="0" cy="80" r="4" fill="#ffffff" opacity="0.4" filter="url(#hglow)"/>
+      <circle cx="-80" cy="0" r="4" fill="#ffd600" opacity="0.4" filter="url(#hglow)"/>
+      <!-- Outer hex -->
+      <polygon points="0,-62 53.7,-31 53.7,31 0,62 -53.7,31 -53.7,-31" fill="none" stroke="#ffffff" stroke-width="1.2" opacity="0.18"/>
+      <!-- Hex nodes + spokes -->
+      <circle cx="0" cy="-62" r="2.5" fill="#ffd600" filter="url(#hglow)"/>
+      <circle cx="53.7" cy="-31" r="2.5" fill="#ffd600" filter="url(#hglow)"/>
+      <circle cx="53.7" cy="31" r="2.5" fill="#ffd600" filter="url(#hglow)"/>
+      <circle cx="0" cy="62" r="2.5" fill="#ffd600" filter="url(#hglow)"/>
+      <circle cx="-53.7" cy="31" r="2.5" fill="#ffd600" filter="url(#hglow)"/>
+      <circle cx="-53.7" cy="-31" r="2.5" fill="#ffd600" filter="url(#hglow)"/>
+      <line x1="0" y1="-62" x2="0" y2="-40" stroke="#ffd600" stroke-width="1" opacity="0.35"/>
+      <line x1="53.7" y1="-31" x2="35" y2="-20" stroke="#ffd600" stroke-width="1" opacity="0.35"/>
+      <line x1="53.7" y1="31" x2="35" y2="20" stroke="#ffd600" stroke-width="1" opacity="0.35"/>
+      <line x1="0" y1="62" x2="0" y2="40" stroke="#ffd600" stroke-width="1" opacity="0.35"/>
+      <line x1="-53.7" y1="31" x2="-35" y2="20" stroke="#ffd600" stroke-width="1" opacity="0.35"/>
+      <line x1="-53.7" y1="-31" x2="-35" y2="-20" stroke="#ffd600" stroke-width="1" opacity="0.35"/>
+      <!-- Core hex — HARDCODED dark fill -->
+      <polygon points="0,-40 34.6,-20 34.6,20 0,40 -34.6,20 -34.6,-20" fill="#1a1200" stroke="url(#hblue)" stroke-width="2.5" filter="url(#hglow)"/>
+      <!-- K mono -->
+      <line x1="-13" y1="-23" x2="-13" y2="23" stroke="url(#hkarl)" stroke-width="5" stroke-linecap="round"/>
+      <line x1="-13" y1="-2" x2="13" y2="-23" stroke="url(#hkarl)" stroke-width="5" stroke-linecap="round"/>
+      <line x1="-13" y1="-2" x2="13" y2="23" stroke="url(#hkarl)" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="-13" cy="-2" r="4.5" fill="#1a1200" stroke="#ffd600" stroke-width="1.8"/>
+      <circle cx="-13" cy="-2" r="2" fill="#ffffff" filter="url(#hglow)"/>
+      <line x1="-13" y1="23" x2="10" y2="23" stroke="#ffd600" stroke-width="3.5" stroke-linecap="round"/>
+      <!-- Top node -->
+      <circle cx="0" cy="-80" r="6" fill="none" stroke="#ffffff" stroke-width="1.8" opacity="0.6"/>
+      <circle cx="0" cy="-80" r="3" fill="#ffffff" filter="url(#hglow2)"/>
+    </g>
+
+    <!-- WORDMARK — all hardcoded colors -->
+    <text x="222" y="124" font-family="Georgia,'Times New Roman',serif" font-size="86" font-weight="900" letter-spacing="10" fill="url(#hkarl)">KARL</text>
+    <line x1="222" y1="140" x2="668" y2="140" stroke="#ffd600" stroke-width="1" opacity="0.35"/>
+    <rect x="222" y="135" width="52" height="5" rx="2.5" fill="#ffffff" opacity="0.8"/>
+    <text x="226" y="194" font-family="Georgia,'Times New Roman',serif" font-size="52" font-weight="400" letter-spacing="25" fill="#ffe082">LYNEX</text>
+    <text x="228" y="228" font-family="'Courier New',monospace" font-size="10" letter-spacing="6" fill="#ffffff" opacity="0.3">KARL  LYNEX  TECHNOLOGIES</text>
+    <text x="228" y="254" font-family="'Courier New',monospace" font-size="9.5" letter-spacing="4.5" fill="#ffd600" opacity="0.75">OS  ARCHITECTURE  ·  AI  INTELLIGENCE  SYSTEMS</text>
+    <!-- Blink cursor -->
+    <rect x="634" y="244" width="6" height="12" rx="1" fill="#ffd600" opacity="0.7">
+      <animate attributeName="opacity" values="0.7;0;0;0.7" dur="1.4s" repeatCount="indefinite"/>
+    </rect>
+  </svg>
+
+  <p class="hero-tagline">Next-Generation OS &amp; AI Infrastructure</p>
+  <h1 class="hero-headline">Built for the <span class="hl">Future.</span><br/>Powered by Intelligence.</h1>
+  <p class="hero-sub">Karl Lynex Technologies engineers operating systems and AI worker frameworks that redefine how machines think, operate, and evolve.</p>
+  <div class="hero-cta">
+    <a href="#about" class="btn-primary">Discover More</a>
+    <a href="#contact" class="btn-outline">Get In Touch</a>
+  </div>
+
+  <div class="scroll-hint">
+    <div class="scroll-arrow"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- ===== ABOUT ===== -->
+<section id="about">
+  <div class="section-label">// WHO WE ARE</div>
+  <h2 class="section-title">About Karl Lynex</h2>
+  <div class="section-line"></div>
+
+  <div class="about-grid">
+    <div class="about-text">
+      <p>Karl Lynex Technologies is a pioneering company at the intersection of operating system engineering and artificial intelligence. We design the invisible layer that powers the next generation of intelligent machines.</p>
+      <p>Our mission is to build robust, scalable OS architectures tightly integrated with AI worker systems — enabling autonomous decision-making, real-time learning, and seamless human-machine collaboration.</p>
+      <p>From the kernel to the cognitive layer, every line of code at Karl Lynex is crafted with precision, purpose, and an unwavering commitment to the future.</p>
+
+      <div style="margin-top:32px;">
+        <div style="font-size:0.72rem;font-weight:700;letter-spacing:5px;text-transform:uppercase;color:var(--primary);margin-bottom:14px;">CORE TEAM</div>
+        <div>
+          <div class="team-chip"><div class="chip-dot"></div>Engineering</div>
+          <div class="team-chip"><div class="chip-dot"></div>AI Research</div>
+          <div class="team-chip"><div class="chip-dot"></div>OS Architecture</div>
+          <div class="team-chip"><div class="chip-dot"></div>Systems Design</div>
+          <div class="team-chip"><div class="chip-dot"></div>Product</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-cards">
+      <!-- CEO Card -->
+      <div class="about-card">
+        <div class="card-badge">LEADERSHIP</div>
+        <!-- Full Karl Lynex logo with company name — hardcoded, never changes -->
+        <svg width="100%" viewBox="0 0 420 110" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:18px;display:block;max-width:360px;border-radius:10px;">
+          <defs>
+            <radialGradient id="ceo-bg" cx="30%" cy="50%" r="70%">
+              <stop offset="0%" stop-color="#3d2e00"/>
+              <stop offset="100%" stop-color="#1a1200"/>
+            </radialGradient>
+            <linearGradient id="ceo-gold" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#ffd600"/>
+              <stop offset="100%" stop-color="#f57f17"/>
+            </linearGradient>
+            <linearGradient id="ceo-text" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="100%" stop-color="#ffd600"/>
+            </linearGradient>
+            <filter id="ceo-glow2"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <!-- Background -->
+          <rect width="420" height="110" rx="10" fill="url(#ceo-bg)"/>
+          <rect x="1" y="1" width="418" height="108" rx="9" fill="none" stroke="#ffd600" stroke-width="0.8" opacity="0.4"/>
+          <!-- Corner brackets -->
+          <polyline points="10,1 1,1 1,10" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+          <polyline points="410,1 419,1 419,10" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+          <polyline points="10,109 1,109 1,100" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+          <polyline points="410,109 419,109 419,100" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+
+          <!-- ICON (left) -->
+          <g transform="translate(56,55)">
+            <!-- Orbit ring -->
+            <circle cx="0" cy="0" r="38" fill="none" stroke="#ffd600" stroke-width="0.6" stroke-dasharray="3 5" opacity="0.3"/>
+            <circle cx="0" cy="-38" r="2.5" fill="#ffffff" opacity="0.5" filter="url(#ceo-glow2)"/>
+            <circle cx="38" cy="0" r="2.5" fill="#ffd600" opacity="0.5" filter="url(#ceo-glow2)"/>
+            <!-- Hex -->
+            <polygon points="0,-29 25,-14.5 25,14.5 0,29 -25,14.5 -25,-14.5" fill="#1a1200" stroke="url(#ceo-gold)" stroke-width="1.8"/>
+            <!-- Hex corner nodes -->
+            <circle cx="0" cy="-29" r="1.8" fill="#ffd600"/>
+            <circle cx="25" cy="-14.5" r="1.8" fill="#ffd600"/>
+            <circle cx="25" cy="14.5" r="1.8" fill="#ffd600"/>
+            <circle cx="0" cy="29" r="1.8" fill="#ffd600"/>
+            <circle cx="-25" cy="14.5" r="1.8" fill="#ffd600"/>
+            <circle cx="-25" cy="-14.5" r="1.8" fill="#ffd600"/>
+            <!-- K monogram -->
+            <line x1="-9" y1="-17" x2="-9" y2="17" stroke="url(#ceo-text)" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="-9" y1="-1" x2="10" y2="-17" stroke="url(#ceo-text)" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="-9" y1="-1" x2="10" y2="17" stroke="url(#ceo-text)" stroke-width="3.5" stroke-linecap="round"/>
+            <circle cx="-9" cy="-1" r="3" fill="#1a1200" stroke="#ffd600" stroke-width="1.4"/>
+            <circle cx="-9" cy="-1" r="1.3" fill="#ffffff" filter="url(#ceo-glow2)"/>
+            <line x1="-9" y1="17" x2="7" y2="17" stroke="#ffd600" stroke-width="2.5" stroke-linecap="round"/>
+          </g>
+
+          <!-- Divider -->
+          <line x1="100" y1="18" x2="100" y2="92" stroke="#ffd600" stroke-width="0.7" opacity="0.3"/>
+
+          <!-- WORDMARK -->
+          <text x="116" y="58" font-family="Georgia,'Times New Roman',serif" font-size="38" font-weight="900" letter-spacing="5" fill="url(#ceo-text)">KARL</text>
+          <line x1="116" y1="66" x2="400" y2="66" stroke="#ffd600" stroke-width="0.7" opacity="0.35"/>
+          <rect x="116" y="63" width="28" height="3" rx="1.5" fill="#ffffff" opacity="0.8"/>
+          <text x="118" y="90" font-family="Georgia,'Times New Roman',serif" font-size="24" font-weight="400" letter-spacing="12" fill="#ffe082">LYNEX</text>
+        </svg>
+        <div class="card-name">Ahnaf Noho Odri</div>
+        <div class="card-role">Chief Executive Officer · Founder</div>
+        <div class="card-desc">Visionary leader and founder of Karl Lynex Technologies. Driving the company's mission to build intelligent operating systems and AI-powered worker frameworks that shape the future of computing.</div>
+      </div>
+
+      <!-- Team Card -->
+      <div class="about-card">
+        <div class="card-badge">ORGANIZATION</div>
+        <!-- Same full Karl Lynex logo as CEO card — hardcoded, never changes -->
+        <svg width="100%" viewBox="0 0 420 110" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:18px;display:block;max-width:360px;border-radius:10px;">
+          <defs>
+            <radialGradient id="team-bg" cx="30%" cy="50%" r="70%">
+              <stop offset="0%" stop-color="#3d2e00"/>
+              <stop offset="100%" stop-color="#1a1200"/>
+            </radialGradient>
+            <linearGradient id="team-gold" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#ffd600"/>
+              <stop offset="100%" stop-color="#f57f17"/>
+            </linearGradient>
+            <linearGradient id="team-text" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="100%" stop-color="#ffd600"/>
+            </linearGradient>
+            <filter id="team-glow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <rect width="420" height="110" rx="10" fill="url(#team-bg)"/>
+          <rect x="1" y="1" width="418" height="108" rx="9" fill="none" stroke="#ffd600" stroke-width="0.8" opacity="0.4"/>
+          <polyline points="10,1 1,1 1,10" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+          <polyline points="410,1 419,1 419,10" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+          <polyline points="10,109 1,109 1,100" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+          <polyline points="410,109 419,109 419,100" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+          <g transform="translate(56,55)">
+            <circle cx="0" cy="0" r="38" fill="none" stroke="#ffd600" stroke-width="0.6" stroke-dasharray="3 5" opacity="0.3"/>
+            <circle cx="0" cy="-38" r="2.5" fill="#ffffff" opacity="0.5" filter="url(#team-glow)"/>
+            <circle cx="38" cy="0" r="2.5" fill="#ffd600" opacity="0.5" filter="url(#team-glow)"/>
+            <polygon points="0,-29 25,-14.5 25,14.5 0,29 -25,14.5 -25,-14.5" fill="#1a1200" stroke="url(#team-gold)" stroke-width="1.8"/>
+            <circle cx="0" cy="-29" r="1.8" fill="#ffd600"/>
+            <circle cx="25" cy="-14.5" r="1.8" fill="#ffd600"/>
+            <circle cx="25" cy="14.5" r="1.8" fill="#ffd600"/>
+            <circle cx="0" cy="29" r="1.8" fill="#ffd600"/>
+            <circle cx="-25" cy="14.5" r="1.8" fill="#ffd600"/>
+            <circle cx="-25" cy="-14.5" r="1.8" fill="#ffd600"/>
+            <line x1="-9" y1="-17" x2="-9" y2="17" stroke="url(#team-text)" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="-9" y1="-1" x2="10" y2="-17" stroke="url(#team-text)" stroke-width="3.5" stroke-linecap="round"/>
+            <line x1="-9" y1="-1" x2="10" y2="17" stroke="url(#team-text)" stroke-width="3.5" stroke-linecap="round"/>
+            <circle cx="-9" cy="-1" r="3" fill="#1a1200" stroke="#ffd600" stroke-width="1.4"/>
+            <circle cx="-9" cy="-1" r="1.3" fill="#ffffff" filter="url(#team-glow)"/>
+            <line x1="-9" y1="17" x2="7" y2="17" stroke="#ffd600" stroke-width="2.5" stroke-linecap="round"/>
+          </g>
+          <line x1="100" y1="18" x2="100" y2="92" stroke="#ffd600" stroke-width="0.7" opacity="0.3"/>
+          <text x="116" y="58" font-family="Georgia,'Times New Roman',serif" font-size="38" font-weight="900" letter-spacing="5" fill="url(#team-text)">KARL</text>
+          <line x1="116" y1="66" x2="400" y2="66" stroke="#ffd600" stroke-width="0.7" opacity="0.35"/>
+          <rect x="116" y="63" width="28" height="3" rx="1.5" fill="#ffffff" opacity="0.8"/>
+          <text x="118" y="90" font-family="Georgia,'Times New Roman',serif" font-size="24" font-weight="400" letter-spacing="12" fill="#ffe082">LYNEX</text>
+        </svg>
+        <div class="card-name">KARL LYNEX</div>
+        <div class="card-role">The Team · Technologies Division</div>
+        <div class="card-desc">A dedicated collective of engineers, researchers, and designers united under the Karl Lynex banner — building the tools, systems, and intelligence layers that will define tomorrow's computing landscape.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SERVICES ===== -->
+<section id="services">
+  <div class="section-label">// WHAT WE BUILD</div>
+  <h2 class="section-title">Our Capabilities</h2>
+  <div class="section-line"></div>
+
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-icon">⚙️</div>
+      <div class="service-title">OS Architecture</div>
+      <p class="service-desc">Custom operating system design from the kernel upward. Built for performance, security, and seamless AI integration at every layer.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🤖</div>
+      <div class="service-title">AI Worker Systems</div>
+      <p class="service-desc">Autonomous AI agents and worker frameworks that learn, adapt, and execute complex tasks with minimal human oversight.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🧠</div>
+      <div class="service-title">Cognitive Compute</div>
+      <p class="service-desc">Intelligent compute layers that bridge the gap between traditional processing and neural inference at system level.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🔒</div>
+      <div class="service-title">Secure Infrastructure</div>
+      <p class="service-desc">Hardened system infrastructure with zero-trust principles embedded at the OS level — secure by design, not by patch.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🌐</div>
+      <div class="service-title">Distributed Networks</div>
+      <p class="service-desc">Mesh networking and distributed system frameworks enabling AI workers to collaborate across nodes in real time.</p>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">📡</div>
+      <div class="service-title">Real-Time Intelligence</div>
+      <p class="service-desc">Edge-native AI inference pipelines that deliver millisecond-level intelligent responses without cloud dependency.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== STATS ===== -->
+<section id="stats">
+  <div class="stats-grid">
+    <div>
+      <div class="stat-num">12<span class="unit">+</span></div>
+      <div class="stat-label">Active Projects</div>
+    </div>
+    <div>
+      <div class="stat-num">99<span class="unit">%</span></div>
+      <div class="stat-label">System Uptime</div>
+    </div>
+    <div>
+      <div class="stat-num">3<span class="unit">x</span></div>
+      <div class="stat-label">Faster AI Inference</div>
+    </div>
+    <div>
+      <div class="stat-num">01<span class="unit">/</span></div>
+      <div class="stat-label">Vision Realized</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CONTACT ===== -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="section-label">// GET IN TOUCH</div>
+    <h2 class="section-title">Contact Us</h2>
+    <div class="section-line" style="margin:0 auto 32px;"></div>
+    <p>Interested in building with Karl Lynex? Whether you're a partner, investor, or visionary — we want to hear from you.</p>
+    <div class="contact-box">
+      <input class="contact-field" type="text" placeholder="Your Name"/>
+      <input class="contact-field" type="email" placeholder="Email Address"/>
+      <textarea class="contact-field" placeholder="Your Message"></textarea>
+      <button class="btn-primary" style="width:100%;justify-content:center;" onclick="handleSend()">SEND MESSAGE</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-brand">KARL <span>LYNEX</span> TECHNOLOGIES</div>
+  <div class="footer-copy">© 2025 Karl Lynex. All rights reserved.</div>
+  <div class="status-row">
+    <div class="status-dot"></div>
+    ALL SYSTEMS OPERATIONAL
+  </div>
+</footer>
+
+<script>
+  // ===== THEME TOGGLE =====
+  function toggleTheme() {
+    const html = document.documentElement;
+    const isLight = html.getAttribute('data-theme') === 'light';
+    html.setAttribute('data-theme', isLight ? 'dark' : 'light');
+    document.getElementById('themeLabel').textContent = isLight ? 'DARK' : 'LIGHT';
+  }
+
+  // ===== PARTICLES =====
+  function spawnParticles() {
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 18; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = Math.random() * 4 + 2;
+      const x = Math.random() * 100;
+      const dur = Math.random() * 18 + 12;
+      const delay = Math.random() * -20;
+      const isWhite = Math.random() > 0.5;
+      p.style.cssText = `
+        width:${size}px; height:${size}px;
+        left:${x}vw;
+        background:${isWhite ? 'rgba(255,255,255,0.5)' : 'rgba(255,214,0,0.6)'};
+        animation-duration:${dur}s;
+        animation-delay:${delay}s;
+      `;
+      container.appendChild(p);
+    }
+  }
+  spawnParticles();
+
+  // ===== CONTACT SEND =====
+  function handleSend() {
+    alert('Message sent! The Karl Lynex team will be in touch soon.');
+  }
+
+  // ===== SCROLL REVEAL =====
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.about-card, .service-card, .stat-num').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(24px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
